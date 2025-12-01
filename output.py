@@ -16,6 +16,7 @@ def read_expenses(csv_file="expenses.csv"):
     try:
         with open(csv_file, "r", encoding="utf-8") as f:
             reader = csv.reader(f)
+            header = next(reader, None)  # 略過標題列（date,amount,category,note）
             for row in reader:
                 # 保護性檢查：跳過欄位數不對的列
                 if len(row) < 4:
@@ -38,6 +39,25 @@ def read_expenses(csv_file="expenses.csv"):
 
     return category_totals
 
+def plot_pie_chart_on_ax(category_totals, ax):
+    ax.clear()
+
+    if not category_totals:
+        ax.text(0.5, 0.5, "No data yet", ha="center", va="center", fontsize=14)
+        ax.axis("off")
+        return
+
+    labels = list(category_totals.keys())
+    sizes = list(category_totals.values())
+
+    ax.pie(
+        sizes,
+        labels=labels,
+        autopct="%1.1f%%",
+        startangle=90,
+    )
+    ax.set_title("Expenses by Category")
+    ax.axis("equal")
 
 def plot_pie_chart(category_totals):
     """
@@ -61,7 +81,7 @@ def plot_pie_chart(category_totals):
     plt.title("Expenses by Category")
     plt.axis("equal")  # 讓圓餅圖看起來是正圓
 
-    # 顯示圖表
+    # 顯示圖表（阻塞顯示，讓圖停留在畫面）
     plt.tight_layout()
     plt.show()
     # 若想存成圖片，可取消下面註解：
