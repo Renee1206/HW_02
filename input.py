@@ -1,35 +1,31 @@
 # input.py
 
-def add_expense():
-    """
-    Input a single expense record.
-    Returns True if a record was saved, or False if the user chose to quit.
-    """
-    print("\n--- New Expense ---")
+import os
+import csv
 
-    # 允許用 q 結束整個輸入流程
-    date = input("Date (YYYY-MM-DD) (or q to quit): ").strip()
-    if date.lower() == "q":
-        return False
 
-    # 金額：做錯誤檢查
-    while True:
-        amount = input("Amount: ").strip()
-        try:
-            amount_value = float(amount)
-            break
-        except ValueError:
-            print("Amount must be a number. Please try again.")
+def save_expense(date: str, amount: str, category: str, note: str, csv_file: str = "expenses.csv"):
+    if not date:
+        raise ValueError("Date is required.")
+    if not category:
+        raise ValueError("Category is required.")
+    if not amount:
+        raise ValueError("Amount is required.")
 
-    category = input("Category: ").strip()
-    note = input("Note (optional): ").strip()
+    try:
+        amount_value = float(amount)
+    except ValueError:
+        raise ValueError("Amount must be a number.")
 
-    # 寫入 CSV
-    with open("expenses.csv", "a", encoding="utf-8") as f:
-        f.write(f"{date},{amount_value},{category},{note}\n")
+    if amount_value < 0:
+        raise ValueError("Amount cannot be negative.")
 
-    print("Expense saved to expenses.csv!")
-    return True
+    file_exists = os.path.exists(csv_file)
+    needs_header = (not file_exists) or os.path.getsize(csv_file) == 0
 
-if __name__ == "__main__":
-    add_expense()
+    with open(csv_file, "a", encoding="utf-8", newline="") as f:
+        writer = csv.writer(f)
+        if needs_header:
+            writer.writerow(["date", "amount", "category", "note"])
+        writer.writerow([date, amount_value, category, note])
+main
