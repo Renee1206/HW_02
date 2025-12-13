@@ -31,6 +31,5 @@ def add_expense():
     print("Expense saved to expenses.csv!")
     return True
 
-
 if __name__ == "__main__":
     add_expense()
